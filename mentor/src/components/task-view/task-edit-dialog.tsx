@@ -21,7 +21,17 @@ import {
 import { ContextPicker } from "@/components/shared/context-picker";
 import { useCreateTask, useUpdateTask } from "@/hooks/use-tasks";
 import { useUiStore } from "@/stores/ui-store";
-import { TaskWithChildren, TaskSizeLabels } from "@/lib/types/task";
+import { TaskWithChildren, TaskSizeLabels, TaskStatusLabels } from "@/lib/types/task";
+
+const importanceLabels: Record<string, string> = {
+  "0": "None", "1": "1", "2": "2", "3": "3", "4": "4", "5": "5",
+};
+const sizeValueToLabel = Object.fromEntries(
+  Object.entries(TaskSizeLabels).map(([k, v]) => [k, v])
+);
+const sizeLabelToValue = Object.fromEntries(
+  Object.entries(TaskSizeLabels).map(([k, v]) => [v, k])
+);
 
 type TaskEditDialogProps = {
   open: boolean;
@@ -42,9 +52,9 @@ export function TaskEditDialog({
 
   const [description, setDescription] = useState("");
   const [contextId, setContextId] = useState<number | null>(null);
-  const [importance, setImportance] = useState("0");
-  const [urgency, setUrgency] = useState("0");
-  const [size, setSize] = useState("0");
+  const [importance, setImportance] = useState("None");
+  const [urgency, setUrgency] = useState("None");
+  const [size, setSize] = useState("Undefined");
   const [sizeCustom, setSizeCustom] = useState("");
   const [dateDue, setDateDue] = useState("");
 
@@ -53,17 +63,17 @@ export function TaskEditDialog({
       if (task) {
         setDescription(task.description);
         setContextId(task.contextId);
-        setImportance(String(task.importance));
-        setUrgency(String(task.urgency));
-        setSize(String(task.size));
+        setImportance(importanceLabels[String(task.importance)] ?? "None");
+        setUrgency(importanceLabels[String(task.urgency)] ?? "None");
+        setSize(sizeValueToLabel[String(task.size)] ?? "Undefined");
         setSizeCustom(task.sizeCustom ? String(task.sizeCustom) : "");
         setDateDue(task.dateDue ? task.dateDue.split("T")[0] : "");
       } else {
         setDescription("");
         setContextId(null);
-        setImportance("0");
-        setUrgency("0");
-        setSize("0");
+        setImportance("None");
+        setUrgency("None");
+        setSize("Undefined");
         setSizeCustom("");
         setDateDue("");
       }
@@ -79,10 +89,10 @@ export function TaskEditDialog({
     const payload = {
       description: description.trim(),
       contextId,
-      importance: Number(importance),
-      urgency: Number(urgency),
-      size: Number(size),
-      sizeCustom: size === "5" && sizeCustom ? Number(sizeCustom) : null,
+      importance: importance === "None" ? 0 : Number(importance),
+      urgency: urgency === "None" ? 0 : Number(urgency),
+      size: Number(sizeLabelToValue[size] ?? 0),
+      sizeCustom: size === "Custom" && sizeCustom ? Number(sizeCustom) : null,
       dateDue: dateDue || null,
     };
 
@@ -149,9 +159,9 @@ export function TaskEditDialog({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {[0, 1, 2, 3, 4, 5].map((n) => (
-                    <SelectItem key={n} value={String(n)}>
-                      {n === 0 ? "None" : n}
+                  {Object.entries(importanceLabels).map(([, label]) => (
+                    <SelectItem key={label} value={label}>
+                      {label}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -165,9 +175,9 @@ export function TaskEditDialog({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {[0, 1, 2, 3, 4, 5].map((n) => (
-                    <SelectItem key={n} value={String(n)}>
-                      {n === 0 ? "None" : n}
+                  {Object.entries(importanceLabels).map(([, label]) => (
+                    <SelectItem key={label} value={label}>
+                      {label}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -183,8 +193,8 @@ export function TaskEditDialog({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {Object.entries(TaskSizeLabels).map(([val, label]) => (
-                    <SelectItem key={val} value={val}>
+                  {Object.values(TaskSizeLabels).map((label) => (
+                    <SelectItem key={label} value={label}>
                       {label}
                     </SelectItem>
                   ))}
@@ -192,7 +202,7 @@ export function TaskEditDialog({
               </Select>
             </div>
 
-            {size === "5" && (
+            {size === "Custom" && (
               <div className="flex flex-col gap-1.5">
                 <Label>Custom (minutes)</Label>
                 <Input
