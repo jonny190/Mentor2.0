@@ -1,0 +1,163 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String
+  password  String
+  createdAt DateTime @default(now())
+
+  tasks               Task[]
+  contexts            Context[]
+  timeSlots           TimeSlot[]
+  filters             Filter[]
+  preferences         UserPreferences?
+  taskSlotAssignments TaskSlotAssignment[]
+  repeatPatterns      RepeatPattern[]
+}
+
+model Task {
+  id            Int       @id @default(autoincrement())
+  parent        Task?     @relation("TaskHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  parentId      Int?
+  children      Task[]    @relation("TaskHierarchy")
+  type          Int       @default(0)
+  context       Context?  @relation(fields: [contextId], references: [id], onDelete: SetNull)
+  contextId     Int?
+  flags         Int       @default(0)
+  importance    Int       @default(0)
+  urgency       Int       @default(0)
+  size          Int       @default(0)
+  sizeCustom    Int?
+  status        Int       @default(0)
+  schedule      Int       @default(0)
+  dateEntered   DateTime  @default(now())
+  dateUpdated   DateTime  @default(now()) @updatedAt
+  dateScheduled DateTime?
+  dateDue       DateTime?
+  description   String    @default("")
+  crossRef      String    @default("")
+  stateText     String    @default("")
+  notes         String    @default("")
+  sortOrder     Int       @default(0)
+
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int
+
+  slotAssignments TaskSlotAssignment[]
+
+  @@index([userId, parentId])
+  @@index([userId, status])
+  @@index([userId, contextId])
+  @@index([userId, dateScheduled])
+  @@index([userId, dateDue])
+}
+
+model Context {
+  id          Int       @id @default(autoincrement())
+  parent      Context?  @relation("ContextHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  parentId    Int?
+  children    Context[] @relation("ContextHierarchy")
+  name        String
+  description String    @default("")
+  ctxType     Int       @default(0)
+  symbolType  Int       @default(0)
+  symbolIcon  String    @default("")
+  sortOrder   Int       @default(0)
+
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int
+
+  tasks     Task[]
+  timeSlots TimeSlot[]
+
+  @@index([userId])
+}
+
+model TimeSlot {
+  id            Int      @id @default(autoincrement())
+  type          Int      @default(0)
+  context       Context? @relation(fields: [contextId], references: [id], onDelete: SetNull)
+  contextId     Int?
+  dateScheduled DateTime
+  startMinutes  Int      @default(540)
+  endMinutes    Int      @default(1020)
+  allocated     Int      @default(0)
+  scheduled     Int      @default(0)
+  count         Int      @default(0)
+  overallAlloc  Int      @default(0)
+  description   String   @default("")
+  crossRef      String   @default("")
+
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int
+
+  taskAssignments TaskSlotAssignment[]
+  repeatPatterns  RepeatPattern[]
+
+  @@index([userId, dateScheduled])
+  @@index([userId, contextId])
+}
+
+model RepeatPattern {
+  id          Int       @id @default(autoincrement())
+  slot        TimeSlot  @relation(fields: [slotId], references: [id], onDelete: Cascade)
+  slotId      Int
+  type        Int
+  intervalVal Int       @default(1)
+  dateTo      DateTime?
+  dateFrom    DateTime
+  occurrences Int       @default(0)
+  flags       Int       @default(0)
+  priority    Int       @default(1)
+  pattern     String    @default("")
+
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int
+}
+
+model TaskSlotAssignment {
+  id     Int      @id @default(autoincrement())
+  task   Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  taskId Int
+  slot   TimeSlot @relation(fields: [slotId], references: [id], onDelete: Cascade)
+  slotId Int
+
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int
+
+  @@unique([taskId, slotId])
+  @@index([userId])
+}
+
+model Filter {
+  id        Int    @id @default(autoincrement())
+  name      String
+  impFilter String @default("")
+  urgFilter String @default("")
+  sizFilter String @default("")
+  staFilter String @default("")
+  schFilter String @default("")
+  ctxFilter String @default("")
+  flgFilter String @default("")
+
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int
+
+  @@index([userId])
+}
+
+model UserPreferences {
+  id     Int  @id @default(autoincrement())
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int  @unique
+  prefs  Json @default("{}")
+}
