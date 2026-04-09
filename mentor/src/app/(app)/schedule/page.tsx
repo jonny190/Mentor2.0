@@ -13,14 +13,18 @@ import { useReschedule } from "@/hooks/use-scheduling";
 import { useScheduleStore } from "@/stores/schedule-store";
 import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import { TimeSlotWithContext } from "@/lib/types/slot";
+import { cn } from "@/lib/utils";
 
 export default function SchedulePage() {
   const router = useRouter();
   const { currentDate, goToToday } = useScheduleStore();
   const reschedule = useReschedule();
+  const deleteSlot = useDeleteSlot();
+  const completeSlot = useCompleteSlot();
 
   const [editorOpen, setEditorOpen] = useState(false);
   const [editingSlot, setEditingSlot] = useState<TimeSlotWithContext | null>(null);
+  const [slotMenu, setSlotMenu] = useState<{ slot: TimeSlotWithContext; x: number; y: number } | null>(null);
 
   const handleNewSlot = () => {
     setEditingSlot(null);
@@ -28,16 +32,12 @@ export default function SchedulePage() {
   };
 
   const handleSlotClick = (slot: TimeSlotWithContext) => {
-    setEditingSlot(slot);
-    setEditorOpen(true);
+    // Show action menu instead of directly editing
+    setSlotMenu({ slot, x: 0, y: 0 });
   };
 
   const handleTaskClick = (taskId: number) => {
     router.push("/tasks");
-  };
-
-  const handleRescheduleAll = () => {
-    reschedule.mutate({ mode: "full" });
   };
 
   const shortcuts = useMemo(
@@ -64,7 +64,7 @@ export default function SchedulePage() {
         <Button
           variant="outline"
           size="sm"
-          onClick={handleRescheduleAll}
+          onClick={() => reschedule.mutate({ mode: "full" })}
           disabled={reschedule.isPending}
         >
           <RefreshCw className="mr-1 h-4 w-4" />
@@ -73,6 +73,48 @@ export default function SchedulePage() {
       </div>
 
       <ScheduleList onSlotClick={handleSlotClick} onTaskClick={handleTaskClick} />
+
+      {/* Slot action menu */}
+      {slotMenu && (
+        <div
+          className="fixed inset-0 z-40"
+          onClick={() => setSlotMenu(null)}
+        >
+          <div
+            className="fixed left-1/2 top-1/2 z-50 min-w-48 -translate-x-1/2 -translate-y-1/2 rounded-lg border bg-popover p-1 shadow-lg"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p className="px-2 py-1 text-xs font-medium text-muted-foreground truncate">
+              {slotMenu.slot.description || "Time Slot"}
+            </p>
+            <div className="my-1 h-px bg-border" />
+            <button
+              className="flex w-full rounded-md px-2 py-1.5 text-left text-sm hover:bg-accent"
+              onClick={() => { setEditingSlot(slotMenu.slot); setEditorOpen(true); setSlotMenu(null); }}
+            >
+              Edit Slot
+            </button>
+            <button
+              className="flex w-full rounded-md px-2 py-1.5 text-left text-sm hover:bg-accent"
+              onClick={() => { completeSlot.mutate({ id: slotMenu.slot.id, rescheduleMode: "this-slot" }); setSlotMenu(null); }}
+            >
+              Complete Slot
+            </button>
+            <div className="my-1 h-px bg-border" />
+            <button
+              className="flex w-full rounded-md px-2 py-1.5 text-left text-sm text-destructive hover:bg-destructive/10"
+              onClick={() => {
+                if (confirm("Delete this time slot?")) {
+                  deleteSlot.mutate(slotMenu.slot.id);
+                }
+                setSlotMenu(null);
+              }}
+            >
+              Delete Slot
+            </button>
+          </div>
+        </div>
+      )}
 
       <SlotEditorDialog
         open={editorOpen}

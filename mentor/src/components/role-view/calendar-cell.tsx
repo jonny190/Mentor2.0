@@ -26,8 +26,11 @@ export function CalendarCell({
   onCellClick,
   onSlotClick,
 }: CalendarCellProps) {
+  // Calculate usage: total task count vs total capacity in the cell
+  // Each slot's capacity is its allocated minutes; each task is assumed to use sizeHour (60min) as default
   const totalAllocated = slots.reduce((sum, s) => sum + s.allocated, 0);
-  const totalUsed = slots.reduce((sum, s) => sum + s.overallAlloc, 0);
+  const totalTaskMinutes = slots.reduce((sum, s) => sum + s.taskAssignments.length * 60, 0);
+  const totalUsed = Math.min(totalAllocated, totalTaskMinutes);
   const maxVisible = compact ? 1 : 3;
   const overflow = slots.length - maxVisible;
 

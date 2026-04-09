@@ -201,134 +201,46 @@ export default function TasksPage() {
         <div
           className="fixed inset-0 z-40"
           onClick={closeContextMenu}
-          onContextMenu={(e) => {
-            e.preventDefault();
-            closeContextMenu();
-          }}
+          onContextMenu={(e) => { e.preventDefault(); closeContextMenu(); }}
         >
-          <DropdownMenu open onOpenChange={(open) => !open && closeContextMenu()}>
-            <div
-              style={{
-                position: "fixed",
-                left: contextMenu.x,
-                top: contextMenu.y,
-                width: 0,
-                height: 0,
-              }}
-            >
-              {/* Invisible anchor for the dropdown positioner */}
-            </div>
-            <DropdownMenuContent
-              side="bottom"
-              align="start"
-              sideOffset={0}
-              className="min-w-48"
-              style={{
-                position: "fixed",
-                left: contextMenu.x,
-                top: contextMenu.y,
-              }}
-            >
-              <DropdownMenuItem
-                onClick={() => {
-                  handleEditTask(contextMenu.task);
-                  closeContextMenu();
-                }}
-              >
-                Edit
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => {
-                  setEditingTask(contextMenu.task);
-                  setShowDialog(true);
-                  closeContextMenu();
-                }}
-              >
-                Notes
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => { setInterventionTask(contextMenu.task); closeContextMenu(); }}>
-                Schedule
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() => {
-                  toggleBold.mutate(contextMenu.task.id);
-                  closeContextMenu();
-                }}
-              >
-                Toggle Bold
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() => {
-                  setClipboard({ id: contextMenu.task.id, mode: "cut" });
-                  closeContextMenu();
-                }}
-              >
-                Cut
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => {
-                  setClipboard({ id: contextMenu.task.id, mode: "copy" });
-                  closeContextMenu();
-                }}
-              >
-                Copy
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() => {
-                  changeStatus.mutate({
-                    id: contextMenu.task.id,
-                    status: TaskStatus.DONE,
-                  });
-                  closeContextMenu();
-                }}
-              >
-                Mark Done
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => {
-                  changeStatus.mutate({
-                    id: contextMenu.task.id,
-                    status: TaskStatus.DROPPED,
-                  });
-                  closeContextMenu();
-                }}
-              >
-                Mark Dropped
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => {
-                  changeStatus.mutate({
-                    id: contextMenu.task.id,
-                    status: TaskStatus.DEFERRED,
-                  });
-                  closeContextMenu();
-                }}
-              >
-                Mark Deferred
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => {
-                  changeStatus.mutate({
-                    id: contextMenu.task.id,
-                    status: TaskStatus.DELEGATED,
-                  });
-                  closeContextMenu();
-                }}
-              >
-                Mark Delegated
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                variant="destructive"
-                onClick={() => handleDelete(contextMenu.task)}
-              >
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div
+            className="fixed z-50 min-w-48 rounded-lg border bg-popover p-1 shadow-lg"
+            style={{ left: contextMenu.x, top: contextMenu.y }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {[
+              { label: "Edit", action: () => { handleEditTask(contextMenu.task); closeContextMenu(); } },
+              { label: "Notes", action: () => { setEditingTask(contextMenu.task); setShowDialog(true); closeContextMenu(); } },
+              { label: "Schedule", action: () => { setInterventionTask(contextMenu.task); closeContextMenu(); } },
+              null,
+              { label: "Toggle Bold", action: () => { toggleBold.mutate(contextMenu.task.id); closeContextMenu(); } },
+              null,
+              { label: "Cut", action: () => { setClipboard({ id: contextMenu.task.id, mode: "cut" }); closeContextMenu(); } },
+              { label: "Copy", action: () => { setClipboard({ id: contextMenu.task.id, mode: "copy" }); closeContextMenu(); } },
+              null,
+              { label: "Mark Done", action: () => { changeStatus.mutate({ id: contextMenu.task.id, status: TaskStatus.DONE }); closeContextMenu(); } },
+              { label: "Mark Dropped", action: () => { changeStatus.mutate({ id: contextMenu.task.id, status: TaskStatus.DROPPED }); closeContextMenu(); } },
+              { label: "Mark Deferred", action: () => { changeStatus.mutate({ id: contextMenu.task.id, status: TaskStatus.DEFERRED }); closeContextMenu(); } },
+              { label: "Mark Delegated", action: () => { changeStatus.mutate({ id: contextMenu.task.id, status: TaskStatus.DELEGATED }); closeContextMenu(); } },
+              null,
+              { label: "Delete", action: () => handleDelete(contextMenu.task), destructive: true },
+            ].map((item, i) =>
+              item === null ? (
+                <div key={`sep-${i}`} className="my-1 h-px bg-border" />
+              ) : (
+                <button
+                  key={item.label}
+                  onClick={item.action}
+                  className={cn(
+                    "flex w-full rounded-md px-2 py-1.5 text-left text-sm transition-colors hover:bg-accent",
+                    (item as { destructive?: boolean }).destructive && "text-destructive hover:bg-destructive/10"
+                  )}
+                >
+                  {item.label}
+                </button>
+              )
+            )}
+          </div>
         </div>
       )}
 
