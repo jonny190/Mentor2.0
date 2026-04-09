@@ -20,6 +20,7 @@ type SlotEditorDialogProps = {
   onOpenChange: (open: boolean) => void;
   slot: TimeSlotWithContext | null;
   defaultDate?: string;
+  defaultContextId?: number | null;
 };
 
 function timeToMinutes(time: string): number {
@@ -42,8 +43,9 @@ export function SlotEditorDialog({
   onOpenChange,
   slot,
   defaultDate,
+  defaultContextId,
 }: SlotEditorDialogProps) {
-  const [contextId, setContextId] = useState<number | null>(null);
+  const [contextId, setContextId] = useState<number | null>(defaultContextId ?? null);
   const [date, setDate] = useState(defaultDate || todayString());
   const [startTime, setStartTime] = useState("09:00");
   const [endTime, setEndTime] = useState("17:00");
@@ -62,13 +64,13 @@ export function SlotEditorDialog({
       setEndTime(minutesToTime(slot.endMinutes));
       setDescription(slot.description || "");
     } else {
-      setContextId(null);
+      setContextId(defaultContextId ?? null);
       setDate(defaultDate || todayString());
       setStartTime("09:00");
       setEndTime("17:00");
       setDescription("");
     }
-  }, [slot, defaultDate, open]);
+  }, [slot, defaultDate, defaultContextId, open]);
 
   const handleSave = async () => {
     const payload = {

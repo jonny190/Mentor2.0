@@ -241,7 +241,23 @@ async function main() {
     }
   }
 
-  console.log("Created time slots and schedule seed data.");
+  // Add a weekly repeat pattern to the first work slot (Mon-Fri)
+  if (slots.length > 0) {
+    await prisma.repeatPattern.create({
+      data: {
+        slotId: slots[0].id,
+        type: 2, // weekly
+        intervalVal: 1,
+        dateFrom: today,
+        occurrences: 0, // forever
+        priority: 1,
+        pattern: "0,1,2,3,4", // Mon-Fri
+        userId: user.id,
+      },
+    });
+  }
+
+  console.log("Created time slots and schedule seed data with role view data.");
   console.log("Seeding complete.");
 }
 
