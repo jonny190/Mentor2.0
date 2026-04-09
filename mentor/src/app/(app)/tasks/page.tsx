@@ -123,6 +123,7 @@ export default function TasksPage() {
   // Keyboard shortcuts
   const shortcuts = useMemo(
     () => ({
+      "ctrl+n": () => handleNewTask(),
       "ctrl+f": () => setSearchOpen(true),
       "ctrl+z": () => undo(),
       "ctrl+shift+z": () => redo(),

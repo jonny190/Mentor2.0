@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -16,10 +16,11 @@ import { SlotEditorDialog } from "@/components/schedule-view/slot-editor-dialog"
 import { RepeatPatternDialog } from "@/components/role-view/repeat-pattern-dialog";
 import { useRoleStore } from "@/stores/role-store";
 import { useDeleteSlot, useCompleteSlot } from "@/hooks/use-slots";
+import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import type { TimeSlotWithContext } from "@/lib/types/slot";
 
 export default function RolesPage() {
-  const { setSelectedCell } = useRoleStore();
+  const { setSelectedCell, goToCurrentWeek } = useRoleStore();
   const deleteSlot = useDeleteSlot();
   const completeSlot = useCompleteSlot();
 
@@ -91,6 +92,19 @@ export default function RolesPage() {
     await deleteSlot.mutateAsync(activeSlot.id);
     setMenuOpen(false);
   };
+
+  const shortcuts = useMemo(
+    () => ({
+      "ctrl+n": () => {
+        setDefaultDate(undefined);
+        setDefaultContextId(null);
+        setSlotEditorOpen(true);
+      },
+      " ": () => goToCurrentWeek(),
+    }),
+    [goToCurrentWeek]
+  );
+  useKeyboardShortcuts(shortcuts);
 
   return (
     <div className="flex h-full flex-col">

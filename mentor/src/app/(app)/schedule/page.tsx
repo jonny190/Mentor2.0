@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Plus, RefreshCw } from "lucide-react";
@@ -11,11 +11,12 @@ import { SlotEditorDialog } from "@/components/schedule-view/slot-editor-dialog"
 import { useDeleteSlot, useCompleteSlot } from "@/hooks/use-slots";
 import { useReschedule } from "@/hooks/use-scheduling";
 import { useScheduleStore } from "@/stores/schedule-store";
+import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import { TimeSlotWithContext } from "@/lib/types/slot";
 
 export default function SchedulePage() {
   const router = useRouter();
-  const { currentDate } = useScheduleStore();
+  const { currentDate, goToToday } = useScheduleStore();
   const reschedule = useReschedule();
 
   const [editorOpen, setEditorOpen] = useState(false);
@@ -38,6 +39,15 @@ export default function SchedulePage() {
   const handleRescheduleAll = () => {
     reschedule.mutate({ mode: "all-current" });
   };
+
+  const shortcuts = useMemo(
+    () => ({
+      "ctrl+n": () => handleNewSlot(),
+      " ": () => goToToday(),
+    }),
+    [goToToday]
+  );
+  useKeyboardShortcuts(shortcuts);
 
   const defaultDate = currentDate.toISOString().slice(0, 10);
 

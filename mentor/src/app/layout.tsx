@@ -15,7 +15,12 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Mentor",
-  description: "Task management and scheduling application",
+  description: "Personal project management and task scheduling",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Mentor",
+  },
 };
 
 export default function RootLayout({
