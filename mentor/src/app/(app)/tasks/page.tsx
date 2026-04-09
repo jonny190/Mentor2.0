@@ -31,6 +31,7 @@ import {
 } from "@/hooks/use-tasks";
 import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import { TaskStatus, TaskType, TaskWithChildren } from "@/lib/types/task";
+import { InterventionDialog } from "@/components/shared/intervention-dialog";
 
 type ClipboardState = {
   id: number;
@@ -57,6 +58,8 @@ export default function TasksPage() {
   const [deleteConfirm, setDeleteConfirm] = useState<TaskWithChildren | null>(
     null
   );
+
+  const [interventionTask, setInterventionTask] = useState<TaskWithChildren | null>(null);
 
   const toggleBold = useToggleBold();
   const changeStatus = useChangeStatus();
@@ -242,6 +245,9 @@ export default function TasksPage() {
               >
                 Notes
               </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => { setInterventionTask(contextMenu.task); closeContextMenu(); }}>
+                Schedule
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={() => {
@@ -348,6 +354,12 @@ export default function TasksPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <InterventionDialog
+        open={interventionTask !== null}
+        onOpenChange={(open) => { if (!open) setInterventionTask(null); }}
+        task={interventionTask}
+      />
     </div>
   );
 }
