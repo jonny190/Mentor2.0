@@ -27,6 +27,8 @@ export async function suggestSlot(
   options: SuggestOptions
 ): Promise<SlotWithCapacity | null> {
   const startDate = options.startDate ?? new Date();
+  // Normalize to start of day so we don't miss today's slots
+  startDate.setHours(0, 0, 0, 0);
   const endDate = new Date(startDate);
   endDate.setDate(endDate.getDate() + options.scanAheadDays);
 
