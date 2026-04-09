@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useCallback } from "react";
 import { Plus, Search, Undo2, Redo2, ClipboardPaste } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
