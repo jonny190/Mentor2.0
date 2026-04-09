@@ -83,7 +83,7 @@ export default function RolesPage() {
 
   const handleCompleteSlot = async () => {
     if (!activeSlot) return;
-    await completeSlot.mutateAsync(activeSlot.id);
+    await completeSlot.mutateAsync({ id: activeSlot.id, rescheduleMode: "this-slot" });
     setMenuOpen(false);
   };
 

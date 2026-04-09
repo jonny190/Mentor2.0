@@ -85,9 +85,11 @@ export function useDeleteSlot() {
 export function useCompleteSlot() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (id: number) => {
+    mutationFn: async ({ id, rescheduleMode = "this-slot" }: { id: number; rescheduleMode?: string }) => {
       const res = await fetch(`/api/slots/${id}/complete`, {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ rescheduleMode }),
       });
       if (!res.ok) throw new Error("Failed to complete slot");
       return res.json();

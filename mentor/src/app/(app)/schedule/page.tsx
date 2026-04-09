@@ -37,7 +37,7 @@ export default function SchedulePage() {
   };
 
   const handleRescheduleAll = () => {
-    reschedule.mutate({ mode: "all-current" });
+    reschedule.mutate({ mode: "full" });
   };
 
   const shortcuts = useMemo(

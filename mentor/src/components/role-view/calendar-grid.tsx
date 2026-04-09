@@ -37,7 +37,7 @@ export function CalendarGrid({ onCellClick, onSlotClick }: CalendarGridProps) {
   const slotMap = useMemo(() => {
     const map = new Map<string, TimeSlotWithContext[]>();
     for (const slot of slots ?? []) {
-      const key = `${slot.contextId ?? 0}-${slot.dateScheduled}`;
+      const key = `${slot.contextId ?? 0}-${slot.dateScheduled.slice(0, 10)}`;
       const arr = map.get(key);
       if (arr) {
         arr.push(slot);

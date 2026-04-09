@@ -43,10 +43,10 @@ export function ScheduleList({ onSlotClick, onTaskClick }: ScheduleListProps) {
       d.setDate(d.getDate() + i);
       map[toDateString(d)] = [];
     }
-    // Fill in slots
+    // Fill in slots - dateScheduled comes as ISO timestamp, normalize to YYYY-MM-DD
     if (slots) {
       for (const slot of slots) {
-        const key = slot.dateScheduled;
+        const key = slot.dateScheduled.slice(0, 10);
         if (map[key]) {
           map[key].push(slot);
         }

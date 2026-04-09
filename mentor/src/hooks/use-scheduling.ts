@@ -30,7 +30,8 @@ export function useSuggestSlot() {
         body: JSON.stringify({ taskId }),
       });
       if (!res.ok) throw new Error("Failed to suggest slot");
-      return res.json();
+      const data = await res.json();
+      return data.slot ?? null;
     },
   });
 }
