@@ -109,8 +109,8 @@ export default function RolesPage() {
   return (
     <div className="flex h-full flex-col">
       {/* Toolbar */}
-      <div className="flex items-center justify-between border-b px-4 py-2">
-        <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b px-3 sm:px-4 py-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Button size="sm" onClick={handleNewSlot}>
             <Plus className="mr-1 h-4 w-4" />
             New Slot

@@ -52,7 +52,7 @@ export default function SchedulePage() {
   const defaultDate = currentDate.toISOString().slice(0, 10);
 
   return (
-    <div className="flex h-full flex-col gap-4 p-4">
+    <div className="flex h-full flex-col gap-4 p-3 sm:p-4">
       <div className="flex flex-wrap items-center gap-2">
         <Button size="sm" onClick={handleNewSlot}>
           <Plus className="mr-1 h-4 w-4" />

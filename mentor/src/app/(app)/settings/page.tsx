@@ -8,16 +8,18 @@ import { SchedulingSettings } from "@/components/settings/scheduling-settings";
 import { SizeSettings } from "@/components/settings/size-settings";
 import { FilterSettings } from "@/components/settings/filter-settings";
 import { ContextManagerDialog } from "@/components/shared/context-manager-dialog";
+import { SecurityQuestionsDialog } from "@/components/settings/security-questions-dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { Download, Upload, Settings } from "lucide-react";
+import { Download, Upload, Settings, Shield } from "lucide-react";
 
 export default function SettingsPage() {
   const { data: prefs, isLoading } = usePreferences();
   const { mutate: updatePrefs } = useUpdatePreferences();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showContextManager, setShowContextManager] = useState(false);
+  const [showSecurityQuestions, setShowSecurityQuestions] = useState(false);
 
   if (isLoading || !prefs) {
     return (
@@ -98,6 +100,21 @@ export default function SettingsPage() {
         </div>
         <Separator />
 
+        {/* Security Questions */}
+        <div className="space-y-4">
+          <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+            Security Questions
+          </h3>
+          <p className="text-xs text-muted-foreground">
+            Used to verify your identity if you need to reset your password.
+          </p>
+          <Button variant="outline" onClick={() => setShowSecurityQuestions(true)}>
+            <Shield data-icon="inline-start" />
+            Edit Security Questions
+          </Button>
+        </div>
+        <Separator />
+
         {/* Export */}
         <div className="space-y-4">
           <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
@@ -164,6 +181,11 @@ export default function SettingsPage() {
       <ContextManagerDialog
         open={showContextManager}
         onOpenChange={setShowContextManager}
+      />
+
+      <SecurityQuestionsDialog
+        open={showSecurityQuestions}
+        onOpenChange={setShowSecurityQuestions}
       />
     </ScrollArea>
   );

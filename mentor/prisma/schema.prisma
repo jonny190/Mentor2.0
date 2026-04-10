@@ -22,6 +22,18 @@ model User {
   preferences         UserPreferences?
   taskSlotAssignments TaskSlotAssignment[]
   repeatPatterns      RepeatPattern[]
+  securityQuestions   SecurityQuestion[]
+}
+
+model SecurityQuestion {
+  id         Int    @id @default(autoincrement())
+  user       User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     Int
+  question   String
+  answerHash String
+  sortOrder  Int    @default(0)
+
+  @@index([userId])
 }
 
 model Task {
