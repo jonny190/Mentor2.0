@@ -14,24 +14,37 @@ type ContextPickerProps = {
   onChange: (value: number | null) => void;
 };
 
+const NONE_LABEL = "No context";
+
 export function ContextPicker({ value, onChange }: ContextPickerProps) {
   const { data: contexts } = useContexts();
 
+  // Build lookup maps between name and id so base-ui Select shows the
+  // label in the trigger (base-ui displays the `value` prop as-is).
+  const selected = value !== null
+    ? contexts?.find((c) => c.id === value)?.name ?? NONE_LABEL
+    : NONE_LABEL;
+
   return (
     <Select
-      value={value === null ? "none" : String(value)}
+      value={selected}
       onValueChange={(val) => {
         if (val === null) return;
-        onChange(val === "none" ? null : Number(val));
+        if (val === NONE_LABEL) {
+          onChange(null);
+          return;
+        }
+        const match = contexts?.find((c) => c.name === val);
+        onChange(match ? match.id : null);
       }}
     >
       <SelectTrigger className="w-full">
         <SelectValue placeholder="Select context" />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value="none">No context</SelectItem>
+        <SelectItem value={NONE_LABEL}>{NONE_LABEL}</SelectItem>
         {contexts?.map((ctx) => (
-          <SelectItem key={ctx.id} value={String(ctx.id)}>
+          <SelectItem key={ctx.id} value={ctx.name}>
             {ctx.name}
           </SelectItem>
         ))}
