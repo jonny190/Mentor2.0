@@ -22,6 +22,7 @@ import { ContextPicker } from "@/components/shared/context-picker";
 import { useCreateTask, useUpdateTask } from "@/hooks/use-tasks";
 import { useUiStore } from "@/stores/ui-store";
 import { TaskWithChildren, TaskSizeLabels, TaskStatusLabels } from "@/lib/types/task";
+import { InfoTooltip } from "@/components/shared/info-tooltip";
 
 const importanceLabels: Record<string, string> = {
   "0": "None", "1": "1", "2": "2", "3": "3", "4": "4", "5": "5",
@@ -147,13 +148,23 @@ export function TaskEditDialog({
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <Label>Context</Label>
+            <div className="flex items-center gap-1.5">
+              <Label>Context</Label>
+              <InfoTooltip>
+                Roles or areas of responsibility this task belongs to (e.g. Work, Personal, Study). Tasks are matched to time slots by context.
+              </InfoTooltip>
+            </div>
             <ContextPicker value={contextId} onChange={setContextId} />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
-              <Label>Importance</Label>
+              <div className="flex items-center gap-1.5">
+                <Label>Importance</Label>
+                <InfoTooltip>
+                  How important this task is (0-5). Used alongside urgency to prioritize auto-scheduling.
+                </InfoTooltip>
+              </div>
               <Select value={importance} onValueChange={(val) => { if (val !== null) setImportance(val); }}>
                 <SelectTrigger className="w-full">
                   <SelectValue />
@@ -169,7 +180,12 @@ export function TaskEditDialog({
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <Label>Urgency</Label>
+              <div className="flex items-center gap-1.5">
+                <Label>Urgency</Label>
+                <InfoTooltip>
+                  How urgent this task is (0-5). Higher urgency tasks get scheduled sooner.
+                </InfoTooltip>
+              </div>
               <Select value={urgency} onValueChange={(val) => { if (val !== null) setUrgency(val); }}>
                 <SelectTrigger className="w-full">
                   <SelectValue />
@@ -187,7 +203,12 @@ export function TaskEditDialog({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
-              <Label>Size</Label>
+              <div className="flex items-center gap-1.5">
+                <Label>Size</Label>
+                <InfoTooltip>
+                  How much effort this task needs. Durations are configurable in Settings: Minutes = 15 min, Hour = 60 min, Half Day = 4 hrs, Day = 8 hrs. Used to match tasks to slot capacity.
+                </InfoTooltip>
+              </div>
               <Select value={size} onValueChange={(val) => { if (val !== null) setSize(val); }}>
                 <SelectTrigger className="w-full">
                   <SelectValue />

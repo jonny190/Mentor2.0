@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dialog";
 import { TaskList } from "@/components/task-view/task-list";
 import { TaskEditDialog } from "@/components/task-view/task-edit-dialog";
+import { TaskNotesEditor } from "@/components/task-view/task-notes-editor";
 import { FilterBar } from "@/components/shared/filter-bar";
 import { SearchDialog } from "@/components/shared/search-dialog";
 import { useTaskStore } from "@/stores/task-store";
@@ -61,6 +62,7 @@ export default function TasksPage() {
   );
 
   const [interventionTask, setInterventionTask] = useState<TaskWithChildren | null>(null);
+  const [notesTask, setNotesTask] = useState<TaskWithChildren | null>(null);
 
   const toggleBold = useToggleBold();
   const changeStatus = useChangeStatus();
@@ -211,7 +213,7 @@ export default function TasksPage() {
           >
             {[
               { label: "Edit", action: () => { handleEditTask(contextMenu.task); closeContextMenu(); } },
-              { label: "Notes", action: () => { setEditingTask(contextMenu.task); setShowDialog(true); closeContextMenu(); } },
+              { label: "Notes", action: () => { setNotesTask(contextMenu.task); closeContextMenu(); } },
               { label: "Schedule", action: () => { setInterventionTask(contextMenu.task); closeContextMenu(); } },
               null,
               { label: "Toggle Bold", action: () => { toggleBold.mutate(contextMenu.task.id); closeContextMenu(); } },
@@ -273,6 +275,14 @@ export default function TasksPage() {
         open={interventionTask !== null}
         onOpenChange={(open) => { if (!open) setInterventionTask(null); }}
         task={interventionTask}
+      />
+
+      <TaskNotesEditor
+        open={notesTask !== null}
+        onOpenChange={(open) => { if (!open) setNotesTask(null); }}
+        taskId={notesTask?.id ?? null}
+        taskDescription={notesTask?.description ?? ""}
+        initialNotes={notesTask?.notes ?? ""}
       />
     </div>
   );

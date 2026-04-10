@@ -1,6 +1,7 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
+import { ContextSymbol } from "@/components/shared/context-symbol";
 import { TimeSlotWithContext, formatMinutes } from "@/lib/types/slot";
 import { TaskSizeLabels, TaskStatusLabels } from "@/lib/types/task";
 import { cn } from "@/lib/utils";
@@ -9,7 +10,7 @@ type ScheduleDateGroupProps = {
   date: string;
   slots: TimeSlotWithContext[];
   isToday: boolean;
-  onSlotClick: (slot: TimeSlotWithContext) => void;
+  onSlotClick: (slot: TimeSlotWithContext, e?: React.MouseEvent) => void;
   onTaskClick: (taskId: number) => void;
 };
 
@@ -52,7 +53,8 @@ export function ScheduleDateGroup({
             <div key={slot.id} className="px-3">
               <button
                 className="hover:bg-accent flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm transition-colors"
-                onClick={() => onSlotClick(slot)}
+                onClick={(e) => onSlotClick(slot, e)}
+                onContextMenu={(e) => { e.preventDefault(); onSlotClick(slot, e); }}
               >
                 <span className="text-muted-foreground shrink-0 font-mono text-xs">
                   {formatMinutes(slot.startMinutes)} - {formatMinutes(slot.endMinutes)}
@@ -61,7 +63,8 @@ export function ScheduleDateGroup({
                   <span className="truncate">{slot.description}</span>
                 )}
                 {slot.context && (
-                  <Badge variant="secondary" className="shrink-0 text-xs">
+                  <Badge variant="secondary" className="shrink-0 text-xs gap-1">
+                    <ContextSymbol icon={slot.context.symbolIcon} className="size-3" />
                     {slot.context.name}
                   </Badge>
                 )}

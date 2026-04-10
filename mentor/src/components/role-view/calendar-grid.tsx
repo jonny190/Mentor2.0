@@ -6,6 +6,7 @@ import { useSlots } from "@/hooks/use-slots";
 import { useRoleStore, getVisibleDates } from "@/stores/role-store";
 import { usePreferences } from "@/hooks/use-preferences";
 import { CalendarCell } from "./calendar-cell";
+import { ContextSymbol } from "@/components/shared/context-symbol";
 import type { TimeSlotWithContext } from "@/lib/types/slot";
 
 type CalendarGridProps = {
@@ -97,8 +98,9 @@ export function CalendarGrid({ onCellClick, onSlotClick }: CalendarGridProps) {
         {/* Context rows */}
         {roles.map((ctx) => (
           <Fragment key={ctx.id}>
-            <div className="sticky left-0 z-10 border-b border-r bg-white p-1 text-xs font-medium text-gray-700 truncate">
-              {ctx.name}
+            <div className="sticky left-0 z-10 flex items-center gap-1 border-b border-r bg-white p-1 text-xs font-medium text-gray-700 truncate">
+              <ContextSymbol icon={ctx.symbolIcon} className="size-3.5 text-gray-500" />
+              <span className="truncate">{ctx.name}</span>
             </div>
             {dates.map((date) => {
               const key = `${ctx.id}-${date}`;

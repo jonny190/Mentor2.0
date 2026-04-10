@@ -3,6 +3,7 @@
 import { UserPrefs } from "@/lib/types/preferences";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { InfoTooltip } from "@/components/shared/info-tooltip";
 
 type Props = {
   prefs: UserPrefs;
@@ -12,8 +13,11 @@ type Props = {
 export function SchedulingSettings({ prefs, onChange }: Props) {
   return (
     <div className="space-y-4">
-      <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+      <h3 className="flex items-center gap-1.5 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
         Scheduling
+        <InfoTooltip>
+          Controls how the auto-scheduler matches tasks to time slots. Enable &quot;Auto Schedule&quot; to automatically assign new tasks on creation.
+        </InfoTooltip>
       </h3>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

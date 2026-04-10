@@ -2,6 +2,7 @@
 
 import { ChevronRight, FileText } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { ContextSymbol } from "@/components/shared/context-symbol";
 import { cn } from "@/lib/utils";
 import {
   TaskWithChildren,
@@ -85,7 +86,8 @@ export function TaskTreeItem({
       )}
 
       {task.context && (
-        <Badge variant="outline" className="text-xs flex-shrink-0">
+        <Badge variant="outline" className="text-xs flex-shrink-0 gap-1">
+          <ContextSymbol icon={task.context.symbolIcon} className="size-3" />
           {task.context.name}
         </Badge>
       )}

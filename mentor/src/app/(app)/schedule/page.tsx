@@ -8,6 +8,8 @@ import { FilterBar } from "@/components/shared/filter-bar";
 import { DateNavigator } from "@/components/schedule-view/date-navigator";
 import { ScheduleList } from "@/components/schedule-view/schedule-list";
 import { SlotEditorDialog } from "@/components/schedule-view/slot-editor-dialog";
+import { RepeatPatternDialog } from "@/components/role-view/repeat-pattern-dialog";
+import { InfoTooltip } from "@/components/shared/info-tooltip";
 import { useDeleteSlot, useCompleteSlot } from "@/hooks/use-slots";
 import { useReschedule } from "@/hooks/use-scheduling";
 import { useScheduleStore } from "@/stores/schedule-store";
@@ -25,15 +27,18 @@ export default function SchedulePage() {
   const [editorOpen, setEditorOpen] = useState(false);
   const [editingSlot, setEditingSlot] = useState<TimeSlotWithContext | null>(null);
   const [slotMenu, setSlotMenu] = useState<{ slot: TimeSlotWithContext; x: number; y: number } | null>(null);
+  const [repeatSlot, setRepeatSlot] = useState<{ id: number; date: string } | null>(null);
 
   const handleNewSlot = () => {
     setEditingSlot(null);
     setEditorOpen(true);
   };
 
-  const handleSlotClick = (slot: TimeSlotWithContext) => {
-    // Show action menu instead of directly editing
-    setSlotMenu({ slot, x: 0, y: 0 });
+  const handleSlotClick = (slot: TimeSlotWithContext, e?: React.MouseEvent) => {
+    // Show action menu at click coords (works for left AND right click)
+    const x = e?.clientX ?? window.innerWidth / 2;
+    const y = e?.clientY ?? window.innerHeight / 2;
+    setSlotMenu({ slot, x, y });
   };
 
   const handleTaskClick = (taskId: number) => {
@@ -61,15 +66,20 @@ export default function SchedulePage() {
         <FilterBar />
         <div className="flex-1" />
         <DateNavigator />
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => reschedule.mutate({ mode: "full" })}
-          disabled={reschedule.isPending}
-        >
-          <RefreshCw className="mr-1 h-4 w-4" />
-          {reschedule.isPending ? "Rescheduling..." : "Reschedule All"}
-        </Button>
+        <div className="flex items-center gap-1">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => reschedule.mutate({ mode: "full" })}
+            disabled={reschedule.isPending}
+          >
+            <RefreshCw className="mr-1 h-4 w-4" />
+            {reschedule.isPending ? "Rescheduling..." : "Reschedule All"}
+          </Button>
+          <InfoTooltip>
+            Assigns all unscheduled active tasks to available time slots based on context and capacity. Click a slot to set a repeat pattern (daily, weekly, monthly).
+          </InfoTooltip>
+        </div>
       </div>
 
       <ScheduleList onSlotClick={handleSlotClick} onTaskClick={handleTaskClick} />
@@ -81,7 +91,8 @@ export default function SchedulePage() {
           onClick={() => setSlotMenu(null)}
         >
           <div
-            className="fixed left-1/2 top-1/2 z-50 min-w-48 -translate-x-1/2 -translate-y-1/2 rounded-lg border bg-popover p-1 shadow-lg"
+            className="fixed z-50 min-w-48 rounded-lg border bg-popover p-1 shadow-lg"
+            style={{ left: slotMenu.x, top: slotMenu.y }}
             onClick={(e) => e.stopPropagation()}
           >
             <p className="px-2 py-1 text-xs font-medium text-muted-foreground truncate">
@@ -93,6 +104,18 @@ export default function SchedulePage() {
               onClick={() => { setEditingSlot(slotMenu.slot); setEditorOpen(true); setSlotMenu(null); }}
             >
               Edit Slot
+            </button>
+            <button
+              className="flex w-full rounded-md px-2 py-1.5 text-left text-sm hover:bg-accent"
+              onClick={() => {
+                setRepeatSlot({
+                  id: slotMenu.slot.id,
+                  date: slotMenu.slot.dateScheduled.slice(0, 10),
+                });
+                setSlotMenu(null);
+              }}
+            >
+              Set Repeat
             </button>
             <button
               className="flex w-full rounded-md px-2 py-1.5 text-left text-sm hover:bg-accent"
@@ -121,6 +144,13 @@ export default function SchedulePage() {
         onOpenChange={setEditorOpen}
         slot={editingSlot}
         defaultDate={defaultDate}
+      />
+
+      <RepeatPatternDialog
+        open={repeatSlot !== null}
+        onOpenChange={(open) => { if (!open) setRepeatSlot(null); }}
+        slotId={repeatSlot?.id ?? null}
+        slotDate={repeatSlot?.date ?? ""}
       />
     </div>
   );
