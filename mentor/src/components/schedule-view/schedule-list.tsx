@@ -5,6 +5,7 @@ import { useScheduleStore } from "@/stores/schedule-store";
 import { useSlots } from "@/hooks/use-slots";
 import { ScheduleDateGroup } from "./schedule-date-group";
 import { TimeSlotWithContext } from "@/lib/types/slot";
+import { isoToLocalDateKey } from "@/lib/types/date-utils";
 
 type ScheduleListProps = {
   onSlotClick: (slot: TimeSlotWithContext) => void;
@@ -12,7 +13,10 @@ type ScheduleListProps = {
 };
 
 function toDateString(date: Date): string {
-  return date.toISOString().slice(0, 10);
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
 }
 
 function isSameDay(a: Date, b: Date): boolean {
@@ -46,7 +50,7 @@ export function ScheduleList({ onSlotClick, onTaskClick }: ScheduleListProps) {
     // Fill in slots - dateScheduled comes as ISO timestamp, normalize to YYYY-MM-DD
     if (slots) {
       for (const slot of slots) {
-        const key = slot.dateScheduled.slice(0, 10);
+        const key = isoToLocalDateKey(slot.dateScheduled);
         if (map[key]) {
           map[key].push(slot);
         }

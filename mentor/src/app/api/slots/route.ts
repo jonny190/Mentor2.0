@@ -60,9 +60,15 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const scheduledDate = new Date(dateScheduled);
+  // If the client sends a bare YYYY-MM-DD, anchor it at UTC noon so that
+  // date-only values display on the correct day regardless of timezone.
+  // A full ISO timestamp is passed through unchanged.
+  const isoMatch = /^\d{4}-\d{2}-\d{2}$/.test(dateScheduled);
+  const scheduledDate = isoMatch
+    ? new Date(`${dateScheduled}T12:00:00.000Z`)
+    : new Date(dateScheduled);
   const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  today.setUTCHours(0, 0, 0, 0);
 
   if (scheduledDate < today) {
     return NextResponse.json(

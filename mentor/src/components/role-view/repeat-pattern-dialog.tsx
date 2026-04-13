@@ -90,15 +90,19 @@ export function RepeatPatternDialog({
           <div className="space-y-2">
             <Label>Repeat Type</Label>
             <Select
-              value={String(type)}
-              onValueChange={(val) => setType(Number(val))}
+              value={RepeatTypeLabels[type] ?? RepeatTypeLabels[0]}
+              onValueChange={(val) => {
+                if (val === null) return;
+                const entry = Object.entries(RepeatTypeLabels).find(([, lbl]) => lbl === val);
+                if (entry) setType(Number(entry[0]));
+              }}
             >
               <SelectTrigger className="w-full">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 {Object.entries(RepeatTypeLabels).map(([key, label]) => (
-                  <SelectItem key={key} value={key}>
+                  <SelectItem key={key} value={label}>
                     {label}
                   </SelectItem>
                 ))}
@@ -144,8 +148,12 @@ export function RepeatPatternDialog({
               <div className="space-y-2">
                 <Label>Priority</Label>
                 <Select
-                  value={String(priority)}
-                  onValueChange={(val) => setPriority(Number(val))}
+                  value={RepeatPriorityLabels[priority] ?? RepeatPriorityLabels[1]}
+                  onValueChange={(val) => {
+                    if (val === null) return;
+                    const entry = Object.entries(RepeatPriorityLabels).find(([, lbl]) => lbl === val);
+                    if (entry) setPriority(Number(entry[0]));
+                  }}
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue />
@@ -153,7 +161,7 @@ export function RepeatPatternDialog({
                   <SelectContent>
                     {Object.entries(RepeatPriorityLabels).map(
                       ([key, label]) => (
-                        <SelectItem key={key} value={key}>
+                        <SelectItem key={key} value={label}>
                           {label}
                         </SelectItem>
                       )

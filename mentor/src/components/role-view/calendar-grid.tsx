@@ -8,6 +8,7 @@ import { usePreferences } from "@/hooks/use-preferences";
 import { CalendarCell } from "./calendar-cell";
 import { ContextSymbol } from "@/components/shared/context-symbol";
 import type { TimeSlotWithContext } from "@/lib/types/slot";
+import { isoToLocalDateKey } from "@/lib/types/date-utils";
 
 type CalendarGridProps = {
   onCellClick: (contextId: number, date: string) => void;
@@ -38,7 +39,7 @@ export function CalendarGrid({ onCellClick, onSlotClick }: CalendarGridProps) {
   const slotMap = useMemo(() => {
     const map = new Map<string, TimeSlotWithContext[]>();
     for (const slot of slots ?? []) {
-      const key = `${slot.contextId ?? 0}-${slot.dateScheduled.slice(0, 10)}`;
+      const key = `${slot.contextId ?? 0}-${isoToLocalDateKey(slot.dateScheduled)}`;
       const arr = map.get(key);
       if (arr) {
         arr.push(slot);

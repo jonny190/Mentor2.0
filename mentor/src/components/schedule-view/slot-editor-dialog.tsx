@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ContextPicker } from "@/components/shared/context-picker";
 import { TimeSlotWithContext, formatMinutes } from "@/lib/types/slot";
+import { isoToLocalDateKey } from "@/lib/types/date-utils";
 import { useCreateSlot, useUpdateSlot } from "@/hooks/use-slots";
 
 type SlotEditorDialogProps = {
@@ -35,7 +36,11 @@ function minutesToTime(minutes: number): string {
 }
 
 function todayString(): string {
-  return new Date().toISOString().slice(0, 10);
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
 }
 
 export function SlotEditorDialog({
@@ -59,7 +64,7 @@ export function SlotEditorDialog({
   useEffect(() => {
     if (slot) {
       setContextId(slot.contextId);
-      setDate(slot.dateScheduled);
+      setDate(isoToLocalDateKey(slot.dateScheduled));
       setStartTime(minutesToTime(slot.startMinutes));
       setEndTime(minutesToTime(slot.endMinutes));
       setDescription(slot.description || "");

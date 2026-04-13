@@ -53,7 +53,11 @@ export async function PUT(
     where: { id },
     data: {
       ...(contextId !== undefined && { contextId }),
-      ...(dateScheduled !== undefined && { dateScheduled: new Date(dateScheduled) }),
+      ...(dateScheduled !== undefined && {
+        dateScheduled: /^\d{4}-\d{2}-\d{2}$/.test(dateScheduled)
+          ? new Date(`${dateScheduled}T12:00:00.000Z`)
+          : new Date(dateScheduled),
+      }),
       ...(startMinutes !== undefined && { startMinutes }),
       ...(endMinutes !== undefined && { endMinutes }),
       ...(allocated !== undefined && { allocated }),

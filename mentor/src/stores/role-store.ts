@@ -34,13 +34,20 @@ export function getWeekStart(weekOffset: number): Date {
   return monday;
 }
 
+function toLocalDateString(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
 export function getVisibleDates(weekOffset: number, weeksToShow: number): string[] {
   const start = getWeekStart(weekOffset);
   const dates: string[] = [];
   for (let i = 0; i < weeksToShow * 7; i++) {
     const d = new Date(start);
     d.setDate(start.getDate() + i);
-    dates.push(d.toISOString().split("T")[0]);
+    dates.push(toLocalDateString(d));
   }
   return dates;
 }

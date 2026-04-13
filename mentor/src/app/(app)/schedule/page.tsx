@@ -15,6 +15,7 @@ import { useReschedule } from "@/hooks/use-scheduling";
 import { useScheduleStore } from "@/stores/schedule-store";
 import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import { TimeSlotWithContext } from "@/lib/types/slot";
+import { isoToLocalDateKey } from "@/lib/types/date-utils";
 import { cn } from "@/lib/utils";
 
 export default function SchedulePage() {
@@ -54,7 +55,7 @@ export default function SchedulePage() {
   );
   useKeyboardShortcuts(shortcuts);
 
-  const defaultDate = currentDate.toISOString().slice(0, 10);
+  const defaultDate = isoToLocalDateKey(currentDate.toISOString());
 
   return (
     <div className="flex h-full flex-col gap-4 p-3 sm:p-4">
@@ -110,7 +111,7 @@ export default function SchedulePage() {
               onClick={() => {
                 setRepeatSlot({
                   id: slotMenu.slot.id,
-                  date: slotMenu.slot.dateScheduled.slice(0, 10),
+                  date: isoToLocalDateKey(slotMenu.slot.dateScheduled),
                 });
                 setSlotMenu(null);
               }}
